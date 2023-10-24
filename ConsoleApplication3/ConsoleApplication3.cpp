@@ -1,27 +1,27 @@
 ﻿#include<iostream>
 using namespace std;
 
-void func(double** matr, int n, int s, int* puti, double* last_r)
+void func(double** matrix, int n, int s, int* path, double* last_r)
 {
 	int i, j;
 	int* v;
 	double* r;
-	bool* metka;
+	bool* mark;
 	double temp;
 	bool stop;
 	double min; int min_i;
 	v = new int[n];
 	r = new double[n];
-	metka = new bool[n];
+	mark = new bool[n];
 
 	for (i = 0; i < n; i++)
 	{
-		puti[i] = s;
+		path[i] = s;
 		last_r[i] = 0;//заполняем вектор расстояний
 		//устанавливаем постоянную метку на стартовую вершину
 		//на остальные временные
-		if (i == s) metka[i] = true;
-		else metka[i] = false;
+		if (i == s) mark[i] = true;
+		else mark[i] = false;
 	}
 
 	//шаг цикла
@@ -31,22 +31,22 @@ void func(double** matr, int n, int s, int* puti, double* last_r)
 		for (j = 0; j < n; j++)
 		{
 			//если вершина достижима из стартовой и метка временная
-			if (matr[s][j] != 0 && metka[j] == false)
+			if (matrix[s][j] != 0 && mark[j] == false)
 			{
 				v[j] = j;//запоминаем достижимую вершину
-				r[j] = matr[s][j];//расстояние от старта до вершины
+				r[j] = matrix[s][j];//расстояние от старта до вершины
 			}
 			else v[j] = -1;
 		}
 		//пересчитываем расстояние
 		for (i = 0; i < n; i++)
 		{
-			if (v[i] != -1 && metka[i] == false)
+			if (v[i] != -1 && mark[i] == false)
 			{
 				temp = r[i] + last_r[s];
 				if (temp < last_r[i] || last_r[i] == 0)
 				{
-					puti[i] = s;
+					path[i] = s;
 					last_r[i] = temp;
 				}
 			}
@@ -54,7 +54,7 @@ void func(double** matr, int n, int s, int* puti, double* last_r)
 		//находим минимальное расстояние из вершин с временными метками
 		for (i = 0; i < n; i++)
 		{
-			if (last_r[i] != 0 && metka[i] == false)
+			if (last_r[i] != 0 && mark[i] == false)
 			{
 				min = last_r[i];
 				min_i = i;
@@ -63,7 +63,7 @@ void func(double** matr, int n, int s, int* puti, double* last_r)
 		}
 		for (i = 0; i < n; i++)
 		{
-			if (last_r[i] < min && last_r[i] != 0 && metka[i] == false)
+			if (last_r[i] < min && last_r[i] != 0 && mark[i] == false)
 			{
 				min = last_r[i];
 				min_i = i;
@@ -72,12 +72,12 @@ void func(double** matr, int n, int s, int* puti, double* last_r)
 
 		//новая стартовая метка
 		s = min_i;
-		metka[s] = true;
+		mark[s] = true;
 
 		//проверяем, все ли вершины с постоянными метками
 		for (i = 0; i < n; i++)
 		{
-			if (metka[i] == false)
+			if (mark[i] == false)
 			{
 				stop = false;
 				break;
@@ -97,30 +97,30 @@ void main()
 	cin >> s;
 	s = s - 1;
 
-	double** matr;
+	double** matrix;
 	int i, j;
 	int temp;
-	matr = new double* [n];
+	matrix = new double* [n];
 	for (i = 0; i < n; i++)
-		matr[i] = new double[n];
+		matrix[i] = new double[n];
 
 	cout << "\n*Если вершины не связанны введите 0*\n";
 	for (i = 0; i < n; i++)
 	{
-		matr[i][i] = 0;
+		matrix[i][i] = 0;
 		for (j = i + 1; j < n; j++) {
 			cout << "Введите расстояние " << i + 1 << " - " << j + 1 << " : ";
 			cin >> temp;
-			matr[i][j] = temp;
-			matr[j][i] = temp;
+			matrix[i][j] = temp;
+			matrix[j][i] = temp;
 		}
 	}
 
-	int* puti;
-	puti = new int[n];
+	int* path;
+	path = new int[n];
 	double* last_r;
 	last_r = new double[n];
-	func(matr, n, s, puti, last_r);
+	func(matrix, n, s, path, last_r);
 
 	//вывод минимальных расстояний
 	for (i = 0; i < n; i++)
@@ -134,7 +134,7 @@ void main()
 	for (int k = 0; k < n; k++)
 	{
 		cout << "\nМинимальный путь от " << s + 1 << " до " << k + 1 << " : ";
-		temp = puti[k];
+		temp = path[k];
 		cout << k + 1 << " - " << temp + 1;
 		while (temp != s)
 		{
@@ -142,7 +142,7 @@ void main()
 			{
 				if (i == temp)
 				{
-					temp = puti[i];
+					temp = path[i];
 					cout << " - " << temp + 1;
 					if (temp == s) break;
 				}
